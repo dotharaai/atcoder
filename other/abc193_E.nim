@@ -13,12 +13,8 @@ proc toInt(c:char): int =
     return int(c) - int('0')
 
 
-# 拡張ユークリッド互除法
 
-# in:
-# a,b:求めたい対象
-# out:
-# (gcd(a,b), a*x1+b*x2=gcd(a,b)の解)
+# 拡張ユークリッド互除法
 
 proc xgcd(a,b:int):(int,int,int)=
   var
@@ -35,41 +31,19 @@ proc xgcd(a,b:int):(int,int,int)=
     (y0,y1)=(y1,y0-q*y1)
   return (a,x0,y0)
 
+# modの逆元
 proc modinv(a,m:int):int=
   var (g,x,y)=xgcd(a,m)
   if g!=1:
     return -1
   else:
-    return (x.mod(m)+m) mod m
+    return x mod m
 
-#echo xgcd(-3,7)
-
-
-proc crt(vr:seq[int], vm:seq[int]):(int,int)=
-  if vr.len==0 or vm.len==0:return(0,0)
-  var
-    R = vr[0]
-    M = vm[0]
-  for i in 0..<vr.len:
-    var
-      r = vr[i]
-      m = vm[i]
-    if M<m:
-      (M,m)=(m,M)
-      (R,r)=(r,R)
-    var (d,p,q)=xgcd(M,m)
-    if ((r-R) mod d != 0):return(0,0)
-    var
-      md=m div d
-      tmp = ((((r-R) div d) mod md)*p).mod(md)
-    R+=M*tmp
-    M*=md
-    R.mod=M
-    if R<0:R+=M
-    return (R,M)
-    
-
-proc crt2(b:seq[int],m:seq[int]):(int,int)=
+# 中国剰余定理
+# return
+# r: 答え
+# m: lcm(m)
+proc crt(b:seq[int],m:seq[int]):(int,int)=
   var
     r=0
     M=1
@@ -89,33 +63,26 @@ proc crt2(b:seq[int],m:seq[int]):(int,int)=
 proc solve()=
   var
     t = scan()
-    xx = newseqwith(t,0)
-    yy = newseqwith(t,0)
-    pp = newseqwith(t,0)
-    qq = newseqwith(t,0)
-
-
-  proc s2(x,y,p,q:int):string=
+    cases = newseqwith(t,(scan(),scan(),scan(),scan()))
+  for (x,y,p,q) in cases:
     var
-      r:int
-      m:int
-      res = int.high
-    for ty in 0..<y:
-      for tq in 0..<q:
-        (r,m)=crt2(@[x+ty,p+tq],@[2*x+2*y,p+q])
-        #echo (r,m)
+      result = int.high.div(4)
+      fnd = false
+    for yi in 0..<y:
+      for qi in 0..<q:
+        var (r,m) = crt(@[x+yi,p+qi],@[2*(x+y),p+q])
         if m != -1:
-          res.min=r
-    if res==int.high:
-      result = "infinity"
+          fnd = true
+          result.min=r
+    if not fnd:
+      echo "infinity"
     else:
-      result = $res
+      echo result
+          
 
 
 
-  for i in 0..<t:
-    (xx[i],yy[i],pp[i],qq[i])=(scan(),scan(),scan(),scan())
-  for i in 0..<t:
-    echo s2(xx[i],yy[i],pp[i],qq[i])
+  
 
+  
 solve()

@@ -19,23 +19,24 @@ proc pmod(x:int,m:int):int=
 
 proc solve():int=
   var
-    (n,x)=(scan(),scan())
-    dp:seq[seq[seq[int]]]
+    n = scan()
+    x = scan()
     a = @[0] & newseqwith(n,scan())
-  result = x-a.max
-  for  C in 1..n:
-    dp = newseqwith(n+1,newseqwith(C+1,newseqwith(C, -int.high.div(4))))
+    dp:seq[seq[seq[int]]]
+  result = int.high
+  for k in 1..n:
+    dp = newseqwith(n+1,newseqwith(k+1,newseqwith(k,-int.high.div(4))))
     dp[0][0][0] = 0
-    for i in 1..n:
-      for j in 1..C:
-        for k in 0..<C:
-          #echo fmt"{i},{j},{k}"
-          dp[i][j][k].max= max(dp[i-1][j-1][(k-a[i]).pmod(C)]+a[i], dp[i-1][j][k])
+    for item in 1..n:
+      for use in 1..k:
+        for md in 0..<k:
+          dp[item][use][md] = max(dp[item-1][use][md], dp[item-1][use-1][(md-a[item]).pmod(k)]+a[item])
+    #echo k
+    #echo dp.join("\n")
+    for md in 0..<k:
+      if  dp[n][k][md] >= 0 and (x - dp[n][k][md]).mod(k)==0:
+        result.min=(x - dp[n][k][md]).div(k)
     
-    for t in 0..<C:
-      if (x - dp[n][C][t]) mod C == 0:
-        result.min=(x-dp[n][C][t]).div(C)
-
 
 
 echo solve() 

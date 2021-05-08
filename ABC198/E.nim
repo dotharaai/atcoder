@@ -15,30 +15,30 @@ proc solve()=
   var 
     n = scan()
     c = newseqwith(n,scan())
-    edges = newseqwith(n,newseq[int]())
-    cc = newseqwith(10^5+1,0)
-    touched = newseqwith(n,false)
+    es = newseqwith(n,newseq[int]())
     goodv = newseq[int]()
+    color = newseqwith(c.max()+1,0)
   for i in 0..<n-1:
     var
-      (a,b)=(scan()-1,scan()-1)
-    edges[a].add(b)
-    edges[b].add(a)
-
-  proc dfs(p:int)=
-    touched[p]=true
-    if cc[c[p]] == 0:
+      (a,b) = (scan()-1,scan()-1)
+    es[a].add(b)
+    es[b].add(a)
+  
+  proc dfs(p:int,par:int)=
+    color[c[p]]+=1
+    if color[c[p]]==1:
       goodv.add(p+1)
-    cc[c[p]]+=1
-    for nxt in edges[p]:
-      if not touched[nxt]:
-        dfs(nxt)
-    cc[c[p]]-=1
-    return
-  dfs(0)
-  goodv.sort()
-  echo goodv.join("\n")
+    for nxt in es[p]:
+      if par==nxt:
+        continue
+      dfs(nxt,p)
+    color[c[p]]-=1
+  dfs(0,-1)
+  echo goodv.sorted.join("\n")
 
+
+
+  
 
 
 solve()

@@ -10,21 +10,12 @@ proc toInt(c:char): int =
     return int(c) - int('0')
 
 
-const md = 998244353
+#type hex = enum
   
 
 proc solve():int=
   var
     s = scan()
-  # 1. a,a,a,a,a,a
-  # 2. a,a,a,a,a,b
-  # 3. a,a,a,a,b,b
-  # 4. a,a,a,b,b,b
-  # 5. a,a,a,a,b,c
-  # 5. a,a,a,b,b,c
-  # 6. a,a,b,b,c,c
-
-
   
 
 

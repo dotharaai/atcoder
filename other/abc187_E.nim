@@ -14,62 +14,44 @@ proc toInt(c:char): int =
 
 
 
-proc solve()=
+proc solve():int=
   var
-    N = scan()
-    level = newseqwith(N,-1)
-    nodes = newseqwith(N,newseq[int]())
-    edges = newseq[(int,int)]()
-    cum = newseqwith(N,0)
-    r=newseqwith(N,0)
-
-  for i in 0..<N-1:
-    var (a,b)=(scan()-1,scan()-1)
-    edges.add((a,b))
-    nodes[a].add(b)
-    nodes[b].add(a)
-  
-  proc dfs(p:int)=
-    for next in nodes[p]:
-      if level[next] == -1:
-        level[next]=level[p]+1
-        dfs(next)
-  level[0]=0
-  dfs(0)
-  var q = scan()
-  for i in 0..<q:
-    var (t,e,x)=(scan(),scan()-1,scan())
-    var (a,b) = edges[e]
-    if t==1:
-      if level[a]>level[b]:
-        cum[a]+=x
-      elif level[a]<level[b]:
-        cum[0]+=x
-        cum[b]-=x
-    if t==2:
-      if level[a]<level[b]:
-        cum[b]+=x
-      elif level[a]>level[b]:
-        cum[0]+=x
-        cum[a]-=x
-  proc dfs_solve(p:int,c:int)=
-    r[p] = cum[p]+c
-    for next in nodes[p]:
-      if level[next]>level[p]:
-        dfs_solve(next,r[p])
-
-  dfs_solve(0,0)
-  for i in 0..<N:
-    echo r[i]
-
-
-
-
+    n = scan()
+    m = scan()
+    g = newseqwith(n,newseqwith(n,false))
+    isS = newseqwith(1.shl(n),true)
+    dp = newseqwith(1.shl(n),int.high.div(2))
+  for i in 0..<n:
+    g[i][i] = true
+  for i in 0..<m:
+    var
+      a = scan()-1
+      b = scan()-1
+    g[a][b] = true
+    g[b][a] = true
+  for s in 1..<1.shl(n):
+    for v1 in 0..<n:
+      for v2 in 0..<n:
+        if ((s and 1.shl(v1)) > 0) and ((s and 1.shl(v2)) > 0):
+          isS[s] = isS[s] and g[v1][v2]
+  for i in 0..<n:
+    dp[1.shl(i)]=1
+  for s in 1..<1.shl(n):
+    var b = s
+    #echo s.toBin(n), " : ", isS[s]
+    if isS[s]:
+      dp[s] = 1
+      continue
+    while b>0:
       
-
-
-
+      if b>0 and (b xor s) > 0:
+        #echo b.toBin(n)," , ", (b xor s).toBin(n)
+        dp[s].min= dp[b] + dp[b xor s]
+      b = (b-1) and s
+      
+  return dp[^1]
+  
 
 
   
-solve()
+echo solve() 

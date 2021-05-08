@@ -14,81 +14,54 @@ proc toInt(c:char): int =
 
 
 
+
 proc solve()=
   var
-    (n,m)=(scan(),scan())
-    neib = newseqwith(n,newseqwith(n,int.high))
-    edges = newseqwith(n,newseq[(int,int)]())
-    iedges = newseqwith(n,newseq[(int,int)]())
-    dist = newseqwith(n,newseqwith(n,int.high.div(4)))
-    idist = newseqwith(n,newseqwith(n,int.high.div(4)))
-    self = newseqwith(n,int.high.div(4))
-  
+    n = scan()
+    m = scan()
+    inf = int.high.div(2)
+    es = newseqwith(n,newseq[int]())
+    costs = newseqwith(n,newseq[int]())
+    dist = newseqwith(n,newseqwith(n,inf))
+    self = newseqwith(n,inf)
   for i in 0..<m:
-    var (a,b,c)=(scan()-1,scan()-1,scan())
-    neib[a][b].min=c
-    
-  for i in 0..<n:
-    dist[i][i]=0
-    idist[i][i]=0
-    for j in 0..<n:
-      if neib[i][j]<int.high:
-        if i==j:
-          self[i]=neib[i][j]
-        else:
-          edges[i].add((j,neib[i][j]))
-          iedges[j].add((i,neib[i][j]))
+    var (a,b,c) = (scan()-1,scan()-1,scan())
+    if a==b:
+      self[a].min=c
+    else:
+      es[a].add(b)
+      costs[a].add(c)
 
-  proc dijk(s:int)=
-    var q = initHeapQueue[(int,int)]()
+  proc dijkstra(s:int)=
+    dist[s][s] = 0
+    var
+      q = initHeapQueue[(int,int)]()
     q.push((0,s))
     while q.len>0:
-      var (cost, p) = q.pop()
-      if cost > dist[s][p]:
+      var
+        (cost,p) = q.pop()
+      if dist[s][p] < cost:
         continue
-      else:
-        for (node,c) in edges[p]:
-          if dist[s][node] > c + dist[s][p]:
-            dist[s][node] = c + dist[s][p]
-            q.push((dist[s][node],node))
-      
-  proc idijk(s:int)=
-    var q = initHeapQueue[(int,int)]()
-    q.push((0,s))
-    while q.len>0:
-      var (cost, p) = q.pop()
-      if cost > idist[s][p]:
-        continue
-      else:
-        for (node,c) in iedges[p]:
-          if idist[s][node] > c + idist[s][p]:
-            idist[s][node] = c + idist[s][p]
-            q.push((idist[s][node],node))
-  
+      for (nxt,c) in zip(es[p],costs[p]):
+        if dist[s][nxt] > cost+c:
+          dist[s][nxt] = cost+c
+          q.push((cost+c,nxt))
   for i in 0..<n:
-    dijk(i)
-    idijk(i)
-  #echo join(dist,"\n")
-  for i in 0..<n:
-    var v = self[i]
-    for j in 0..<n:
-      if i!=j:
-        v.min=(dist[i][j]+idist[i][j])
-    if v==int.high.div(4):
-      v = -1
-    echo v
+    dijkstra(i)
+    #echo dist[i]
+  for s in 0..<n:
+    var res = inf
+    for t in 0..<n:
+      if s != t:
+        res.min=dist[s][t]+dist[t][s]
+      else:
+        res.min=self[s]
+    if res == inf:
+      echo "-1"
+    else:
+      echo res
+
+
   
-
-
-
-
-    
-    
-
-
-
-
-
-    
   
 solve()
